@@ -16,12 +16,16 @@ class Problems(Resource):
         platform = request.args.get('platform')
         status = request.args.get('status')
 
+        category = request.args.get('category')
+
         if difficulty:
             query = query.filter_by(difficulty=difficulty)
         if platform:
             query = query.filter_by(platform=platform)
         if status:
             query = query.filter_by(status=status)
+        if category:
+            query = query.filter_by(category=category)
 
         problems = query.all()
         return [p.to_dict(rules=('-user',)) for p in problems], 200
