@@ -5,7 +5,8 @@
 # Remote library imports
 from flask import request
 from flask_restful import Resource
-
+from routes.routes import *
+from models.models import *
 # Local imports
 from config import app, db, api
 # Add your model imports
