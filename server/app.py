@@ -12,7 +12,7 @@ from routes.routes import *
 
 @app.route('/')
 def index():
-    return '<h1>Project Server</h1>'
+    return '<h1>AmiiApps</h1>'
 
 
 if __name__ == '__main__':
