@@ -1,9 +1,13 @@
+import re
+
 from flask import request
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_restful import Resource
 
 from config import api, db
 from models.user import User
+
+EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
 
 
 class Signup(Resource):
@@ -12,6 +16,12 @@ class Signup(Resource):
 
         if not data or not all(k in data for k in ('name', 'email', 'password')):
             return {'error': 'Name, email, and password are required.'}, 400
+
+        if not EMAIL_RE.match(data['email']):
+            return {'error': 'Invalid email address.'}, 422
+
+        if len(data['password']) < 8:
+            return {'error': 'Password must be at least 8 characters.'}, 422
 
         if User.query.filter_by(email=data['email']).first():
             return {'error': 'Email already registered.'}, 409

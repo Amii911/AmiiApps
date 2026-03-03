@@ -1,6 +1,8 @@
 # Standard library imports
+import os
 
 # Remote library imports
+from dotenv import load_dotenv
 from flask import Flask
 from flask_bcrypt import Bcrypt
 from flask_cors import CORS
@@ -10,12 +12,14 @@ from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import MetaData
 
+load_dotenv()
+
 # Instantiate app, set attributes
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'super-secret-key-change-in-production'
-app.config['JWT_SECRET_KEY'] = 'jwt-secret-key-change-in-production'
+app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
+app.config['JWT_SECRET_KEY'] = os.environ['JWT_SECRET_KEY']
 app.json.compact = False
 
 # Define metadata, instantiate db
@@ -30,7 +34,7 @@ db.init_app(app)
 api = Api(app)
 
 # Instantiate CORS
-CORS(app)
+CORS(app, origins=[os.environ.get('FRONTEND_ORIGIN', 'http://localhost:3000')])
 
 # Instantiate JWT
 jwt = JWTManager(app)

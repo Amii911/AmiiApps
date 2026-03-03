@@ -16,4 +16,6 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(port=5555, debug=True)
+    import os
+    debug = os.environ.get('FLASK_DEBUG', 'false').lower() == 'true'
+    app.run(port=5555, debug=debug)
