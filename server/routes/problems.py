@@ -1,21 +1,20 @@
 from flask import request
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restful import Resource
 
+from auth import clerk_required, get_current_user
 from config import api, db
 from models.problem import Problem
 
 
 class Problems(Resource):
-    @jwt_required()
+    @clerk_required
     def get(self):
-        user_id = int(get_jwt_identity())
-        query = Problem.query.filter_by(user_id=user_id)
+        user = get_current_user()
+        query = Problem.query.filter_by(user_id=user.id)
 
         difficulty = request.args.get('difficulty')
         platform = request.args.get('platform')
         status = request.args.get('status')
-
         category = request.args.get('category')
 
         if difficulty:
@@ -27,12 +26,11 @@ class Problems(Resource):
         if category:
             query = query.filter_by(category=category)
 
-        problems = query.all()
-        return [p.to_dict(rules=('-user',)) for p in problems], 200
+        return [p.to_dict(rules=('-user',)) for p in query.all()], 200
 
-    @jwt_required()
+    @clerk_required
     def post(self):
-        user_id = int(get_jwt_identity())
+        user = get_current_user()
         data = request.get_json()
 
         required = ('title', 'platform', 'difficulty', 'status')
@@ -48,7 +46,7 @@ class Problems(Resource):
             notes=data.get('notes'),
             link=data.get('link'),
             date_solved=data.get('date_solved'),
-            user_id=user_id,
+            user_id=user.id,
         )
 
         db.session.add(problem)
@@ -57,26 +55,26 @@ class Problems(Resource):
 
 
 class ProblemById(Resource):
-    @jwt_required()
+    @clerk_required
     def get(self, id):
-        user_id = int(get_jwt_identity())
+        user = get_current_user()
         problem = Problem.query.get(id)
 
         if not problem:
             return {'error': 'Problem not found.'}, 404
-        if problem.user_id != user_id:
+        if problem.user_id != user.id:
             return {'error': 'Unauthorized.'}, 403
 
         return problem.to_dict(rules=('-user',)), 200
 
-    @jwt_required()
+    @clerk_required
     def patch(self, id):
-        user_id = int(get_jwt_identity())
+        user = get_current_user()
         problem = Problem.query.get(id)
 
         if not problem:
             return {'error': 'Problem not found.'}, 404
-        if problem.user_id != user_id:
+        if problem.user_id != user.id:
             return {'error': 'Unauthorized.'}, 403
 
         data = request.get_json()
@@ -87,14 +85,14 @@ class ProblemById(Resource):
         db.session.commit()
         return problem.to_dict(rules=('-user',)), 200
 
-    @jwt_required()
+    @clerk_required
     def delete(self, id):
-        user_id = int(get_jwt_identity())
+        user = get_current_user()
         problem = Problem.query.get(id)
 
         if not problem:
             return {'error': 'Problem not found.'}, 404
-        if problem.user_id != user_id:
+        if problem.user_id != user.id:
             return {'error': 'Unauthorized.'}, 403
 
         db.session.delete(problem)
@@ -103,10 +101,10 @@ class ProblemById(Resource):
 
 
 class ProblemStats(Resource):
-    @jwt_required()
+    @clerk_required
     def get(self):
-        user_id = int(get_jwt_identity())
-        problems = Problem.query.filter_by(user_id=user_id).all()
+        user = get_current_user()
+        problems = Problem.query.filter_by(user_id=user.id).all()
 
         solved = [p for p in problems if p.status == 'solved']
         breakdown = {}

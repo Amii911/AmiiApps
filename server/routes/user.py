@@ -1,92 +1,35 @@
-import re
-
 from flask import request
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask_restful import Resource
 
+from auth import clerk_required, get_current_user
 from config import api, db
-from models.user import User
-
-EMAIL_RE = re.compile(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
 
 
-class Users(Resource):
-    def post(self):
-        data = request.get_json()
-
-        if not data or not all(k in data for k in ('name', 'email', 'password')):
-            return {'error': 'Name, email, and password are required.'}, 400
-
-        if not EMAIL_RE.match(data['email']):
-            return {'error': 'Invalid email address.'}, 422
-
-        if len(data['password']) < 8:
-            return {'error': 'Password must be at least 8 characters.'}, 422
-
-        if User.query.filter_by(email=data['email']).first():
-            return {'error': 'Email already registered.'}, 409
-
-        user = User(name=data['name'], email=data['email'])
-        user.password = data['password']
-
-        db.session.add(user)
-        db.session.commit()
-
-        token = create_access_token(identity=str(user.id))
-        return {'user': user.to_dict(), 'access_token': token}, 201
-
-
-class UserById(Resource):
-    @jwt_required()
-    def get(self, id):
-        current_user_id = int(get_jwt_identity())
-        if current_user_id != id:
-            return {'error': 'Unauthorized.'}, 403
-
-        user = User.query.get(id)
-        if not user:
-            return {'error': 'User not found.'}, 404
-
+class UserMe(Resource):
+    @clerk_required
+    def get(self):
+        user = get_current_user()
         return user.to_dict(), 200
 
-    @jwt_required()
-    def patch(self, id):
-        current_user_id = int(get_jwt_identity())
-        if current_user_id != id:
-            return {'error': 'Unauthorized.'}, 403
+    @clerk_required
+    def patch(self):
+        user = get_current_user()
+        data = request.get_json() or {}
 
-        user = User.query.get(id)
-        if not user:
-            return {'error': 'User not found.'}, 404
-
-        data = request.get_json()
         if 'name' in data:
             user.name = data['name']
         if 'email' in data:
-            existing = User.query.filter_by(email=data['email']).first()
-            if existing and existing.id != id:
-                return {'error': 'Email already in use.'}, 409
             user.email = data['email']
-        if 'password' in data:
-            user.password = data['password']
 
         db.session.commit()
         return user.to_dict(), 200
 
-    @jwt_required()
-    def delete(self, id):
-        current_user_id = int(get_jwt_identity())
-        if current_user_id != id:
-            return {'error': 'Unauthorized.'}, 403
-
-        user = User.query.get(id)
-        if not user:
-            return {'error': 'User not found.'}, 404
-
+    @clerk_required
+    def delete(self):
+        user = get_current_user()
         db.session.delete(user)
         db.session.commit()
-        return {'message': 'User deleted.'}, 200
+        return {'message': 'Account deleted.'}, 200
 
 
-api.add_resource(Users, '/users')
-api.add_resource(UserById, '/users/<int:id>')
+api.add_resource(UserMe, '/users/me')
