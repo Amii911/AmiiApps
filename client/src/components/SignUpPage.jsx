@@ -1,10 +1,46 @@
 import React from "react";
 import { SignUp } from "@clerk/clerk-react";
 
+const clerkAppearance = {
+  variables: {
+    colorPrimary: "#ffa116",
+    colorBackground: "#282828",
+    colorInputBackground: "#3c3c3c",
+    colorInputText: "#ebebeb",
+    colorText: "#ebebeb",
+    colorTextSecondary: "#8d8d8d",
+    colorNeutral: "#8d8d8d",
+    colorDanger: "#ff375f",
+    fontFamily: "Inter, sans-serif",
+    borderRadius: "8px",
+    fontSize: "14px",
+  },
+  elements: {
+    card: "shadow-none border border-[#3c3c3c]",
+    headerTitle: "font-bold text-[#ebebeb]",
+    headerSubtitle: "text-[#8d8d8d]",
+    formButtonPrimary: "bg-[#ffa116] hover:bg-[#ffb84d] text-[#1a1a1a] font-semibold",
+    footerActionLink: "text-[#ffa116] hover:text-[#ffb84d]",
+  },
+};
+
 function SignUpPage() {
   return (
-    <div style={{ display: "flex", justifyContent: "center", marginTop: "4rem" }}>
-      <SignUp path="/sign-up" routing="path" signInUrl="/sign-in" />
+    <div className="min-h-screen bg-[var(--color-bg-page)] flex flex-col items-center justify-center gap-6 px-4">
+      <div className="text-center">
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)]">
+          Amii<span className="text-[var(--color-accent)]">Apps</span>
+        </h1>
+        <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+          Your interview prep dashboard
+        </p>
+      </div>
+      <SignUp
+        path="/sign-up"
+        routing="path"
+        signInUrl="/sign-in"
+        appearance={clerkAppearance}
+      />
     </div>
   );
 }

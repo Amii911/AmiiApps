@@ -10,16 +10,14 @@ function ProtectedRoute({ children }) {
   return (
     <>
       <SignedIn>{children}</SignedIn>
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
+      <SignedOut><RedirectToSignIn /></SignedOut>
     </>
   );
 }
 
 function App() {
   return (
-    <>
+    <div className="min-h-screen bg-[var(--color-bg-page)]">
       <NavBar />
       <Routes>
         <Route path="/sign-in/*" element={<SignInPage />} />
@@ -34,7 +32,7 @@ function App() {
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
-    </>
+    </div>
   );
 }
 

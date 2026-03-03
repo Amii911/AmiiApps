@@ -8,17 +8,72 @@ const PLATFORMS = ["LeetCode", "NeetCode", "HackerRank", "CodeSignal", "Codeforc
 const DIFFICULTIES = ["Easy", "Medium", "Hard"];
 const STATUSES = ["todo", "attempted", "solved"];
 
-const EMPTY_FORM = {
-  title: "",
-  platform: "LeetCode",
-  difficulty: "Easy",
-  status: "todo",
-  category: "",
-  notes: "",
-  link: "",
+const DIFFICULTY_COLORS = {
+  Easy:   "text-[var(--color-easy)]",
+  Medium: "text-[var(--color-medium)]",
+  Hard:   "text-[var(--color-hard)]",
 };
 
-function Dashboard() {
+const DIFFICULTY_BADGE = {
+  Easy:   "bg-[#00b8a3]/10 text-[var(--color-easy)]",
+  Medium: "bg-[#ffc01e]/10 text-[var(--color-medium)]",
+  Hard:   "bg-[#ff375f]/10 text-[var(--color-hard)]",
+};
+
+const STATUS_BADGE = {
+  solved:    "bg-[#2cbb5d]/10 text-[var(--color-solved)]",
+  attempted: "bg-[#ffc01e]/10 text-[var(--color-attempted)]",
+  todo:      "bg-[#8d8d8d]/10 text-[var(--color-todo)]",
+};
+
+const EMPTY_FORM = {
+  title: "", platform: "LeetCode", difficulty: "Easy",
+  status: "todo", category: "", notes: "", link: "",
+};
+
+function Badge({ label, colorClass }) {
+  return (
+    <span className={`inline-block px-2 py-0.5 rounded text-xs font-mono font-medium tracking-wide ${colorClass}`}>
+      {label}
+    </span>
+  );
+}
+
+function StatCard({ label, value, colorClass = "text-[var(--color-text-primary)]" }) {
+  return (
+    <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-5 py-4">
+      <p className="text-xs uppercase tracking-widest text-[var(--color-text-muted)] font-medium mb-1">{label}</p>
+      <p className={`text-2xl font-bold font-mono ${colorClass}`}>{value}</p>
+    </div>
+  );
+}
+
+function FilterSelect({ label, value, options, onChange }) {
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="bg-[var(--color-bg-input)] border border-[var(--color-border)] text-[var(--color-text-secondary)] text-sm rounded-md px-3 py-1.5 focus:outline-none focus:border-[var(--color-accent)] transition-colors cursor-pointer"
+    >
+      <option value="">All {label}s</option>
+      {options.map((o) => <option key={o} value={o}>{o}</option>)}
+    </select>
+  );
+}
+
+function FormField({ label, children }) {
+  return (
+    <div className="flex flex-col gap-1">
+      <label className="text-xs uppercase tracking-widest text-[var(--color-text-muted)] font-medium">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+const inputCls = "bg-[var(--color-bg-input)] border border-[var(--color-border)] text-[var(--color-text-primary)] text-sm rounded-md px-3 py-2 focus:outline-none focus:border-[var(--color-accent)] transition-colors placeholder-[var(--color-text-muted)]";
+const selectCls = `${inputCls} cursor-pointer`;
+
+export default function Dashboard() {
   const { getToken } = useAuth();
   const { user } = useUser();
 
@@ -38,8 +93,8 @@ function Dashboard() {
   const syncUser = useCallback(async () => {
     const headers = await authHeaders();
     await axios.patch(`${API}/users/me`, {
-      name: user?.fullName || user?.firstName,
-      email: user?.primaryEmailAddress?.emailAddress,
+      name: user?.fullName || user?.firstName || null,
+      email: user?.primaryEmailAddress?.emailAddress || null,
     }, { headers }).catch(() => {});
   }, [authHeaders, user]);
 
@@ -87,115 +142,180 @@ function Dashboard() {
 
   function startEdit(problem) {
     setForm({
-      title: problem.title,
-      platform: problem.platform,
-      difficulty: problem.difficulty,
-      status: problem.status,
-      category: problem.category || "",
-      notes: problem.notes || "",
-      link: problem.link || "",
+      title: problem.title, platform: problem.platform,
+      difficulty: problem.difficulty, status: problem.status,
+      category: problem.category || "", notes: problem.notes || "", link: problem.link || "",
     });
     setEditingId(problem.id);
     setShowForm(true);
   }
 
-  if (loading) return <p style={{ padding: "2rem" }}>Loading...</p>;
+  function setField(key, val) {
+    setForm((f) => ({ ...f, [key]: val }));
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <span className="text-[var(--color-text-muted)] font-mono text-sm tracking-widest">Loading...</span>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ maxWidth: "900px", margin: "0 auto", padding: "2rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
+    <div className="max-w-5xl mx-auto px-6 py-8">
+
+      {/* Header */}
+      <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 style={{ margin: 0 }}>Dashboard</h1>
-          {stats && (
-            <p style={{ margin: "0.25rem 0 0", color: "#6b7280" }}>
-              {stats.total_solved} / {stats.total_problems} solved
-              {Object.entries(stats.by_difficulty).map(([d, n]) => ` · ${n} ${d}`)}
-            </p>
-          )}
+          <h1 className="text-3xl font-bold tracking-tight text-[var(--color-text-primary)]">Dashboard</h1>
+          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+            {user?.firstName ? `Welcome back, ${user.firstName}` : "Your interview prep tracker"}
+          </p>
         </div>
-        <button onClick={() => { setForm(EMPTY_FORM); setEditingId(null); setShowForm(true); }}>
+        <button
+          onClick={() => { setForm(EMPTY_FORM); setEditingId(null); setShowForm(true); }}
+          className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[#1a1a1a] text-sm font-semibold px-4 py-2 rounded-md transition-colors"
+        >
           + Add Problem
         </button>
       </div>
 
+      {/* Stats row */}
+      {stats && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+          <StatCard label="Total Solved" value={`${stats.total_solved}/${stats.total_problems}`} colorClass="text-[var(--color-accent)]" />
+          <StatCard label="Easy" value={stats.by_difficulty?.Easy ?? 0} colorClass="text-[var(--color-easy)]" />
+          <StatCard label="Medium" value={stats.by_difficulty?.Medium ?? 0} colorClass="text-[var(--color-medium)]" />
+          <StatCard label="Hard" value={stats.by_difficulty?.Hard ?? 0} colorClass="text-[var(--color-hard)]" />
+        </div>
+      )}
+
       {/* Filters */}
-      <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.5rem", flexWrap: "wrap" }}>
-        {[
-          { key: "difficulty", options: DIFFICULTIES },
-          { key: "platform", options: PLATFORMS },
-          { key: "status", options: STATUSES },
-        ].map(({ key, options }) => (
-          <select
-            key={key}
-            value={filters[key]}
-            onChange={(e) => setFilters((f) => ({ ...f, [key]: e.target.value }))}
-          >
-            <option value="">All {key}s</option>
-            {options.map((o) => <option key={o} value={o}>{o}</option>)}
-          </select>
-        ))}
+      <div className="flex flex-wrap gap-2 mb-6">
+        <FilterSelect label="difficulty" value={filters.difficulty} options={DIFFICULTIES} onChange={(v) => setFilters((f) => ({ ...f, difficulty: v }))} />
+        <FilterSelect label="platform"   value={filters.platform}   options={PLATFORMS}    onChange={(v) => setFilters((f) => ({ ...f, platform: v }))} />
+        <FilterSelect label="status"     value={filters.status}     options={STATUSES}     onChange={(v) => setFilters((f) => ({ ...f, status: v }))} />
       </div>
 
       {/* Problem form */}
       {showForm && (
-        <form onSubmit={handleSubmit} style={{ border: "1px solid #e5e7eb", borderRadius: "8px", padding: "1.5rem", marginBottom: "1.5rem" }}>
-          <h3 style={{ marginTop: 0 }}>{editingId ? "Edit Problem" : "New Problem"}</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
-            <input required placeholder="Title" value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} style={{ gridColumn: "1 / -1" }} />
-            <select value={form.platform} onChange={(e) => setForm((f) => ({ ...f, platform: e.target.value }))}>
-              {PLATFORMS.map((p) => <option key={p}>{p}</option>)}
-            </select>
-            <select value={form.difficulty} onChange={(e) => setForm((f) => ({ ...f, difficulty: e.target.value }))}>
-              {DIFFICULTIES.map((d) => <option key={d}>{d}</option>)}
-            </select>
-            <select value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}>
-              {STATUSES.map((s) => <option key={s}>{s}</option>)}
-            </select>
-            <input placeholder="Category (optional)" value={form.category} onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))} />
-            <input placeholder="Link (optional)" value={form.link} onChange={(e) => setForm((f) => ({ ...f, link: e.target.value }))} style={{ gridColumn: "1 / -1" }} />
-            <textarea placeholder="Notes (optional)" value={form.notes} onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))} rows={2} style={{ gridColumn: "1 / -1" }} />
-          </div>
-          <div style={{ display: "flex", gap: "0.5rem", marginTop: "1rem" }}>
-            <button type="submit">{editingId ? "Save" : "Add"}</button>
-            <button type="button" onClick={() => setShowForm(false)}>Cancel</button>
-          </div>
-        </form>
+        <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg p-6 mb-6">
+          <h2 className="text-base font-semibold text-[var(--color-text-primary)] mb-5">
+            {editingId ? "Edit Problem" : "New Problem"}
+          </h2>
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField label="Title">
+                <input required placeholder="e.g. Two Sum" value={form.title}
+                  onChange={(e) => setField("title", e.target.value)}
+                  className={`${inputCls} col-span-2`} />
+              </FormField>
+
+              <FormField label="Platform">
+                <select value={form.platform} onChange={(e) => setField("platform", e.target.value)} className={selectCls}>
+                  {PLATFORMS.map((p) => <option key={p}>{p}</option>)}
+                </select>
+              </FormField>
+
+              <FormField label="Difficulty">
+                <select value={form.difficulty} onChange={(e) => setField("difficulty", e.target.value)} className={selectCls}>
+                  {DIFFICULTIES.map((d) => <option key={d}>{d}</option>)}
+                </select>
+              </FormField>
+
+              <FormField label="Status">
+                <select value={form.status} onChange={(e) => setField("status", e.target.value)} className={selectCls}>
+                  {STATUSES.map((s) => <option key={s}>{s}</option>)}
+                </select>
+              </FormField>
+
+              <FormField label="Category">
+                <input placeholder="e.g. Arrays, DP, Trees" value={form.category}
+                  onChange={(e) => setField("category", e.target.value)} className={inputCls} />
+              </FormField>
+
+              <FormField label="Link">
+                <input placeholder="https://leetcode.com/problems/..." value={form.link}
+                  onChange={(e) => setField("link", e.target.value)} className={`${inputCls} sm:col-span-2`} />
+              </FormField>
+
+              <FormField label="Notes">
+                <textarea placeholder="Key observations, patterns, time complexity..." value={form.notes}
+                  onChange={(e) => setField("notes", e.target.value)} rows={3}
+                  className={`${inputCls} sm:col-span-2 font-mono text-xs resize-none`} />
+              </FormField>
+            </div>
+
+            <div className="flex gap-3 mt-5">
+              <button type="submit"
+                className="bg-[var(--color-accent)] hover:bg-[var(--color-accent-hover)] text-[#1a1a1a] text-sm font-semibold px-5 py-2 rounded-md transition-colors">
+                {editingId ? "Save Changes" : "Add Problem"}
+              </button>
+              <button type="button" onClick={() => setShowForm(false)}
+                className="bg-transparent border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] text-sm font-medium px-5 py-2 rounded-md transition-colors">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
-      {/* Problem list */}
+      {/* Problem table */}
       {problems.length === 0 ? (
-        <p style={{ color: "#6b7280" }}>No problems yet. Add one above!</p>
+        <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg px-6 py-16 text-center">
+          <p className="text-[var(--color-text-secondary)] text-sm">No problems tracked yet.</p>
+          <p className="text-[var(--color-text-muted)] text-xs mt-1">Hit <span className="text-[var(--color-accent)]">+ Add Problem</span> to get started.</p>
+        </div>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ borderBottom: "2px solid #e5e7eb", textAlign: "left" }}>
-              <th style={{ padding: "0.5rem" }}>Title</th>
-              <th style={{ padding: "0.5rem" }}>Platform</th>
-              <th style={{ padding: "0.5rem" }}>Difficulty</th>
-              <th style={{ padding: "0.5rem" }}>Status</th>
-              <th style={{ padding: "0.5rem" }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {problems.map((p) => (
-              <tr key={p.id} style={{ borderBottom: "1px solid #f3f4f6" }}>
-                <td style={{ padding: "0.5rem" }}>
-                  {p.link ? <a href={p.link} target="_blank" rel="noreferrer">{p.title}</a> : p.title}
-                </td>
-                <td style={{ padding: "0.5rem" }}>{p.platform}</td>
-                <td style={{ padding: "0.5rem" }}>{p.difficulty}</td>
-                <td style={{ padding: "0.5rem" }}>{p.status}</td>
-                <td style={{ padding: "0.5rem", display: "flex", gap: "0.5rem" }}>
-                  <button onClick={() => startEdit(p)}>Edit</button>
-                  <button onClick={() => handleDelete(p.id)}>Delete</button>
-                </td>
+        <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[var(--color-border)]">
+                {["Problem", "Platform", "Difficulty", "Status", "Category", ""].map((h) => (
+                  <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-widest text-[var(--color-text-muted)] font-medium">
+                    {h}
+                  </th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {problems.map((p, i) => (
+                <tr key={p.id}
+                  className={`border-b border-[var(--color-border-subtle)] hover:bg-[var(--color-bg-hover)] transition-colors ${i === problems.length - 1 ? "border-b-0" : ""}`}>
+                  <td className="px-4 py-3 font-medium text-[var(--color-text-primary)]">
+                    {p.link
+                      ? <a href={p.link} target="_blank" rel="noreferrer"
+                          className="hover:text-[var(--color-accent)] transition-colors">{p.title}</a>
+                      : p.title}
+                    {p.notes && <p className="text-xs text-[var(--color-text-muted)] font-mono mt-0.5 truncate max-w-xs">{p.notes}</p>}
+                  </td>
+                  <td className="px-4 py-3 text-[var(--color-text-secondary)]">{p.platform}</td>
+                  <td className="px-4 py-3">
+                    <Badge label={p.difficulty} colorClass={DIFFICULTY_BADGE[p.difficulty]} />
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge label={p.status} colorClass={STATUS_BADGE[p.status]} />
+                  </td>
+                  <td className="px-4 py-3 text-[var(--color-text-muted)] text-xs font-mono">{p.category || "—"}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-3 justify-end">
+                      <button onClick={() => startEdit(p)}
+                        className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-accent)] transition-colors font-medium">
+                        Edit
+                      </button>
+                      <button onClick={() => handleDelete(p.id)}
+                        className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-hard)] transition-colors font-medium">
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
 }
-
-export default Dashboard;
