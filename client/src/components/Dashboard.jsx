@@ -363,7 +363,7 @@ export default function Dashboard() {
         <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-lg overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[var(--color-border)]" style={{ backgroundColor: "#1f1f1f" }}>
+              <tr className="border-b border-[var(--color-border)]" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
                 {["Question", "Source", "Difficulty", "Status", "Topic", ""].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.12em] text-[var(--color-text-muted)] font-semibold">
                     {h}

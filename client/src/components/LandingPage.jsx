@@ -70,7 +70,7 @@ export default function LandingPage() {
       <div className="max-w-5xl mx-auto px-6 pb-24">
         <div className="bg-[var(--color-bg-card)] border border-[var(--color-border)] rounded-xl overflow-hidden">
           {/* Fake window chrome */}
-          <div className="flex items-center gap-1.5 px-4 py-3 border-b border-[var(--color-border)]" style={{ backgroundColor: "#1f1f1f" }}>
+          <div className="flex items-center gap-1.5 px-4 py-3 border-b border-[var(--color-border)]" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#ff375f", opacity: 0.7 }} />
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#ffc01e", opacity: 0.7 }} />
             <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: "#00b8a3", opacity: 0.7 }} />
@@ -94,7 +94,7 @@ export default function LandingPage() {
 
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[var(--color-border)]" style={{ backgroundColor: "#1f1f1f" }}>
+              <tr className="border-b border-[var(--color-border)]" style={{ backgroundColor: "var(--color-bg-subtle)" }}>
                 {["Question", "Source", "Difficulty", "Status", "Topic"].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-[10px] uppercase tracking-[0.12em] text-[var(--color-text-muted)] font-semibold">{h}</th>
                 ))}

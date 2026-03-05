@@ -13,6 +13,9 @@
   --color-bg-input:   #3c3c3c;
   --color-bg-hover:   #333333;
 
+  /* Subtle surface (table headers, window chrome) */
+  --color-bg-subtle: #1f1f1f;
+
   /* Borders */
   --color-border:        #3c3c3c;
   --color-border-subtle: #2e2e2e;
@@ -49,6 +52,35 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   margin: 0;
+}
+
+/* Light mode */
+html.light {
+  --color-bg-page:    #f5f5f5;
+  --color-bg-card:    #ffffff;
+  --color-bg-input:   #ebebeb;
+  --color-bg-hover:   #f0f0f0;
+  --color-bg-subtle:  #f0f0f0;
+
+  --color-border:        #e0e0e0;
+  --color-border-subtle: #ebebeb;
+
+  --color-text-primary:   #1a1a1a;
+  --color-text-secondary: #4d4d4d;
+  --color-text-muted:     #9d9d9d;
+
+  --color-accent:       #e08c00;
+  --color-accent-hover: #c47a00;
+
+  --color-blue:       #2563eb;
+  --color-blue-hover: #1d4ed8;
+
+  --color-easy:    #00897b;
+  --color-medium:  #d97706;
+  --color-hard:    #dc2626;
+  --color-solved:  #16a34a;
+  --color-attempted: #d97706;
+  --color-todo:    #9d9d9d;
 }
 
 /* Scrollbar */
