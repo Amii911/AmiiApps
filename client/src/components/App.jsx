@@ -18,8 +18,9 @@ function ProtectedRoute({ children }) {
 
 function App() {
   return (
-    <div className="min-h-screen bg-[var(--color-bg-page)]">
+    <div className="h-screen flex flex-col bg-[var(--color-bg-page)]">
       <NavBar />
+      <main className="flex-1 min-h-0 overflow-auto">
       <Routes>
         <Route path="/"           element={<LandingPage />} />
         <Route path="/sign-in/*"  element={<SignInPage />} />
@@ -27,6 +28,7 @@ function App() {
         <Route path="/dashboard"  element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="*"           element={<Navigate to="/" replace />} />
       </Routes>
+      </main>
     </div>
   );
 }
