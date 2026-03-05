@@ -4,12 +4,12 @@ import { Link } from "react-router-dom";
 
 function NavBar() {
   return (
-    <nav className="flex items-center justify-between px-6 py-4 border-b border-[var(--color-border)] bg-[var(--color-bg-card)]">
-      <Link
-        to="/"
-        className="font-bold text-lg tracking-tight text-[var(--color-text-primary)] hover:text-[var(--color-accent)] transition-colors no-underline"
-      >
-        Amii<span className="text-[var(--color-accent)]">Apps</span>
+    <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-3.5 border-b border-[var(--color-border)] bg-[var(--color-bg-card)]">
+      <Link to="/" className="flex items-center gap-2.5 no-underline group">
+        <span className="w-2 h-2 rounded-full bg-[var(--color-blue)] group-hover:bg-[var(--color-blue-hover)] transition-colors" />
+        <span className="font-bold text-[17px] tracking-tight text-[var(--color-text-primary)]">
+          Amii<span className="text-[var(--color-accent)]">Apps</span>
+        </span>
       </Link>
 
       <div className="flex items-center gap-4">
@@ -18,7 +18,7 @@ function NavBar() {
             afterSignOutUrl="/sign-in"
             appearance={{
               variables: {
-                colorPrimary: "#ffa116",
+                colorPrimary: "#4f8ef7",
                 colorBackground: "#282828",
                 colorText: "#ebebeb",
                 fontFamily: "Inter, sans-serif",
@@ -29,7 +29,7 @@ function NavBar() {
         </SignedIn>
         <SignedOut>
           <SignInButton mode="redirect" redirectUrl="/sign-in">
-            <button className="text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
+            <button className="text-sm font-medium text-[var(--color-blue)] hover:text-[var(--color-blue-hover)] transition-colors">
               Sign in
             </button>
           </SignInButton>

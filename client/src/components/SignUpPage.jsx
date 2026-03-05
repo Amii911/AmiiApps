@@ -3,7 +3,7 @@ import { SignUp } from "@clerk/clerk-react";
 
 const clerkAppearance = {
   variables: {
-    colorPrimary: "#ffa116",
+    colorPrimary: "#4f8ef7",
     colorBackground: "#282828",
     colorInputBackground: "#3c3c3c",
     colorInputText: "#ebebeb",
@@ -19,8 +19,8 @@ const clerkAppearance = {
     card: "shadow-none border border-[#3c3c3c]",
     headerTitle: "font-bold text-[#ebebeb]",
     headerSubtitle: "text-[#8d8d8d]",
-    formButtonPrimary: "bg-[#ffa116] hover:bg-[#ffb84d] text-[#1a1a1a] font-semibold",
-    footerActionLink: "text-[#ffa116] hover:text-[#ffb84d]",
+    formButtonPrimary: "bg-[#4f8ef7] hover:bg-[#6ba3ff] text-white font-semibold",
+    footerActionLink: "text-[#4f8ef7] hover:text-[#6ba3ff]",
   },
 };
 
