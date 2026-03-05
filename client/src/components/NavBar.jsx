@@ -1,5 +1,5 @@
 import React from "react";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
 
 function NavBar() {
@@ -14,8 +14,12 @@ function NavBar() {
 
       <div className="flex items-center gap-4">
         <SignedIn>
+          <Link to="/dashboard"
+            className="text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors no-underline">
+            Dashboard
+          </Link>
           <UserButton
-            afterSignOutUrl="/sign-in"
+            afterSignOutUrl="/"
             appearance={{
               variables: {
                 colorPrimary: "#4f8ef7",
@@ -28,11 +32,14 @@ function NavBar() {
           />
         </SignedIn>
         <SignedOut>
-          <SignInButton mode="redirect" redirectUrl="/sign-in">
-            <button className="text-sm font-medium text-[var(--color-blue)] hover:text-[var(--color-blue-hover)] transition-colors">
-              Sign in
-            </button>
-          </SignInButton>
+          <Link to="/sign-in"
+            className="text-sm font-medium text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors no-underline">
+            Sign in
+          </Link>
+          <Link to="/sign-up"
+            className="bg-[var(--color-blue)] hover:bg-[var(--color-blue-hover)] text-white text-sm font-semibold px-4 py-1.5 rounded-md transition-colors no-underline">
+            Get Started
+          </Link>
         </SignedOut>
       </div>
     </nav>
